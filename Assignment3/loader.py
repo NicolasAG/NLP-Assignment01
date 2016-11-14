@@ -2,7 +2,7 @@
 Created on Oct 26, 2015
 
 @author: jcheung
-@student: Nicolas A.G.
+@student: nangel3 (Nicolas Angelard-Gontier - 260532513)
 """
 
 import xml.etree.cElementTree as ET
@@ -13,6 +13,9 @@ from nltk.corpus import stopwords
 from nltk.wsd import lesk
 
 import treetaggerwrapper as tt  # use same tagger as the MWSD task to get same lemmas (https://www.cs.york.ac.uk/semeval-2013/task12/index.php%3Fid=data.html)
+
+import numpy as np
+from sklearn import linear_model
 
 STOP_LIST = set(stopwords.words('english'))
 WN_POS_LIST = ['a', 'n', 'v', 'r']
@@ -140,9 +143,9 @@ def predict_synsets(wsd_instance, use_pos=True):
     if lesk2_synset:
         wsd_instance.synset_name['lesk2'] = lesk2_synset.name()
 
-    lesk3_synset = lesk_3(wsd_instance, use_pos)
-    if lesk3_synset:
-        wsd_instance.synset_name['lesk3'] = lesk3_synset.name()
+    # lesk3_synset = lesk_3(wsd_instance, use_pos)
+    # if lesk3_synset:
+    #     wsd_instance.synset_name['lesk3'] = lesk3_synset.name()
 
 
 def lesk_1(wsd_instance, use_pos):
@@ -187,7 +190,57 @@ def lesk_2(wsd_instance, use_pos):
         return lesk(wsd_instance.context, wsd_instance.lemma)
 
 
-def lesk_3(wsd_instance, use_pos):
+def train_lesk3(dev_instances, dev_keys, use_pos):
+    """
+    Try to learn the weight matrix W that best fits any weighted combination of frequency and intersection metrics.
+    :param dev_instances: the instances to get the frequency and intersection metrics from.
+    :param dev_keys: the true labels for each instance
+    :param use_pos: flag to decide to use POS tags to retrieve the synsets.
+    :return: weight of frequency signal (alpha), and weight of intersection signal (beta).
+    """
+    # BUILDING MATRICES X & Y to perform Linear Regression
+    x = []
+    y = []
+    for key, wsd_instance in dev_instances.iteritems():
+
+        if use_pos and wsd_instance.pos in WN_POS_LIST:
+            synsets = wn.synsets(wsd_instance.lemma, wsd_instance.pos)
+        else:
+            synsets = wn.synsets(wsd_instance.lemma)
+
+        context = set(wsd_instance.context)  # unique words(lemmas) in context
+
+        for ss in synsets:
+            # Get sense counts
+            freq = 0
+            for lemma in ss.lemmas():
+                freq += lemma.count()
+
+            # Get the context intersection count
+            definition = ss.definition()
+            tags = tt.make_tags(TAGGER.tag_text(definition))  # tags of the definition
+            lemmas = [tag.lemma for tag in tags]  # lemmatize the definition
+            intersection = len(context.intersection(lemmas))  # number of intersecting lemmas between definition and context
+
+            x.append([freq, intersection])
+            y.append([1 if ss.name() in dev_keys[key] else 0])
+
+    x = np.asarray(x)
+    y = np.asarray(y)
+
+    # LEARNING WEIGHTS
+    regression = linear_model.LinearRegression()
+    regression.fit(x, y)
+    w = regression.coef_[0]
+    # print('Coefficients: \n', regression.coef_)  # coefficients
+    # print('Mean squared error: %.2f' % np.mean((regression.predict(x) - y) ** 2))  # mean squared error
+    # print('Variance score: %.2f' % regression.score(x, y))  # Explained variance score: 1 is perfect prediction
+
+    return 1., 0.5
+    # return w[0], w[1]
+
+
+def lesk_3(wsd_instance, alpha, beta, use_pos):
     """
     Combination of distributional information about the word sense frequency and the standard Lesk's algorithm.
     :param wsd_instance: the WSD instance to define.
@@ -199,8 +252,7 @@ def lesk_3(wsd_instance, use_pos):
     else:
         synsets = wn.synsets(wsd_instance.lemma)
 
-    context = filter(lambda w: w not in STOP_LIST and w != '@card', wsd_instance.context)  # remove stop words
-    context = set(context)  # unique words(lemmas) in context
+    context = set(wsd_instance.context)  # unique words(lemmas) in context
 
     sense2count_intersection = {}  # dictionary of the form {synset_name: (count, intersection_size), ...}
     for ss in synsets:
@@ -217,10 +269,8 @@ def lesk_3(wsd_instance, use_pos):
 
         sense2count_intersection[ss.name()] = (freq, intersection)
 
-    max_count = 0
+    max_count = -1
     ss = synsets[0]
-    alpha = 1.
-    beta = 0.5
     for ss_name, (count, intersection) in sense2count_intersection.iteritems():
         combination = alpha*count + beta*intersection
         if combination > max_count:
@@ -245,11 +295,11 @@ def precision(instances, keys):
     for id, wsd_instance in instances.iteritems():
         # print keys[id]
         # print wsd_instance
-        if wsd_instance.synset_name['lesk1'] and wsd_instance.synset_name['lesk1'] in keys[id]:
+        if wsd_instance.synset_name['lesk1'] is None or wsd_instance.synset_name['lesk1'] in keys[id]:
             precision1_count += 1
-        if wsd_instance.synset_name['lesk2'] and wsd_instance.synset_name['lesk2'] in keys[id]:
+        if wsd_instance.synset_name['lesk2'] is None or wsd_instance.synset_name['lesk2'] in keys[id]:
             precision2_count += 1
-        if wsd_instance.synset_name['lesk3'] and wsd_instance.synset_name['lesk3'] in keys[id]:
+        if wsd_instance.synset_name['lesk3'] is None or wsd_instance.synset_name['lesk3'] in keys[id]:
             precision3_count += 1
 
     return {
@@ -272,11 +322,11 @@ def recall(instances, keys):
     recall3_count = 0.
 
     for id, synsets in keys.iteritems():
-        if instances[id].synset_name['lesk1'] and instances[id].synset_name['lesk1'] in synsets:
+        if len(synsets) == 0 or instances[id].synset_name['lesk1'] in synsets:
             recall1_count += 1
-        if instances[id].synset_name['lesk2'] and instances[id].synset_name['lesk2'] in synsets:
+        if len(synsets) == 0 or instances[id].synset_name['lesk2'] in synsets:
             recall2_count += 1
-        if instances[id].synset_name['lesk3'] and instances[id].synset_name['lesk3'] in synsets:
+        if len(synsets) == 0 or instances[id].synset_name['lesk3'] in synsets:
             recall3_count += 1
 
     return {
@@ -313,6 +363,22 @@ def f1(p, r):
     }
 
 
+def evaluate(instances, keys):
+    """
+    Calculate precision, recall, and f1 score.
+    :param instances: the instances with their predictions.
+    :param keys: the true value of each  instance.
+    :return: (precision, recall, f1_score) in %.
+    """
+    p = precision(instances, keys)
+    r = recall(instances, keys)
+    f1_score = f1(p, r)
+    print "precision:", p
+    print "recall:", r
+    print "f1:", f1_score
+    return p, r, f1_score
+
+
 if __name__ == '__main__':
     data_f = 'multilingual-all-words.en.xml'
     key_f = 'wordnet.en.key'
@@ -328,9 +394,17 @@ if __name__ == '__main__':
     print "new test_instances:", len(test_instances)
 
     ###
+    # EVALUATE BEFORE ANY PREDICTION
+    ###
+    print "\nEvaluation of dev_set:"
+    evaluate(dev_instances, dev_keys)
+    print "\nEvaluation of test_set:"
+    evaluate(test_instances, test_keys)
+
+    ###
     # PREDICT THE SYNSET FOR EACH WSD_INSTANCES
     ###
-    print "\nRunning 3 variations of Lesk's algorithm to predict the word sense of each wsd_instances..."
+    print "\nRunning 2 variations of Lesk's algorithm to predict the word sense of each wsd_instances..."
     for wsd_instance in dev_instances.values():
         predict_synsets(wsd_instance, use_pos=True)
 
@@ -339,20 +413,21 @@ if __name__ == '__main__':
     print "done."
 
     ###
-    # EVALUATE EACH MODEL
+    # TRAIN Lesk3 on dev_set && TEST on test_set
+    ###
+    print "\nTraining parameters of Lesk3 on dev_set and predict the test_set..."
+    alpha, beta = train_lesk3(dev_instances, dev_keys, use_pos=True)
+    # Predict the test_set
+    for wsd_instance in test_instances.values():
+        lesk3_synset = lesk_3(wsd_instance, alpha, beta, use_pos=True)
+        if lesk3_synset:
+            wsd_instance.synset_name['lesk3'] = lesk3_synset.name()
+    print "done."
+
+    ###
+    # EVALUATE EACH MODEL AFTER PREDICTING
     ###
     print "\nEvaluation of dev_set:"
-    p_dev = precision(dev_instances, dev_keys)
-    r_dev = recall(dev_instances, dev_keys)
-    f1_dev = f1(p_dev, r_dev)
-    print "precision:", p_dev
-    print "recall:", r_dev
-    print "f1:", f1_dev
-
+    evaluate(dev_instances, dev_keys)
     print "\nEvaluation of test_set:"
-    p_test = precision(test_instances, test_keys)
-    r_test = recall(test_instances, test_keys)
-    f1_test = f1(p_test, r_test)
-    print "precision:", p_test
-    print "recall:", r_test
-    print "f1:", f1_test
+    evaluate(test_instances, test_keys)
