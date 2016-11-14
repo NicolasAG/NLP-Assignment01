@@ -2,7 +2,7 @@
 Created on Oct 26, 2015
 
 @author: jcheung
-@student: nangel3 (Nicolas Angelard-Gontier - 260532513)
+@student: Nicolas A.G.
 """
 
 import xml.etree.cElementTree as ET
@@ -244,6 +244,8 @@ def lesk_3(wsd_instance, alpha, beta, use_pos):
     """
     Combination of distributional information about the word sense frequency and the standard Lesk's algorithm.
     :param wsd_instance: the WSD instance to define.
+    :param alpha: weight of sense frequency count.
+    :param beta: weight of sense definition intersect count.
     :param use_pos: flag to decide to use POS tags to retrieve the synset.
     :return: the most probable wordnet synset according to a combination of distributional and Lesk signals.
     """
