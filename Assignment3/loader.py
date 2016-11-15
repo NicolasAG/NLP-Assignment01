@@ -11,11 +11,11 @@ import codecs
 from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 from nltk.wsd import lesk
-
-import treetaggerwrapper as tt  # use same tagger as the MWSD task to get same lemmas (https://www.cs.york.ac.uk/semeval-2013/task12/index.php%3Fid=data.html)
-
-import numpy as np
 from sklearn import linear_model
+import treetaggerwrapper as tt  # use same tagger as the MWSD task to get same lemmas (https://www.cs.york.ac.uk/semeval-2013/task12/index.php%3Fid=data.html)
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 STOP_LIST = set(stopwords.words('english'))
 WN_POS_LIST = ['a', 'n', 'v', 'r']
@@ -236,7 +236,7 @@ def train_lesk3(dev_instances, dev_keys, use_pos):
     # print('Mean squared error: %.2f' % np.mean((regression.predict(x) - y) ** 2))  # mean squared error
     # print('Variance score: %.2f' % regression.score(x, y))  # Explained variance score: 1 is perfect prediction
 
-    return 1., 0.5
+    return 1., 0.5  # hard-coded values worked better :/
     # return w[0], w[1]
 
 
@@ -258,12 +258,12 @@ def lesk_3(wsd_instance, alpha, beta, use_pos):
 
     sense2count_intersection = {}  # dictionary of the form {synset_name: (count, intersection_size), ...}
     for ss in synsets:
-        # Get sense counts
+        # Get sense counts (just like in `lesk_1`)
         freq = 0
         for lemma in ss.lemmas():
             freq += lemma.count()
 
-        # Get the context intersection count
+        # Get the context intersection count ("custom" Lesk's algorithm implementation)
         definition = ss.definition()
         tags = tt.make_tags(TAGGER.tag_text(definition))  # tags of the definition
         lemmas = [tag.lemma for tag in tags]  # lemmatize the definition
@@ -275,6 +275,7 @@ def lesk_3(wsd_instance, alpha, beta, use_pos):
     ss = synsets[0]
     for ss_name, (count, intersection) in sense2count_intersection.iteritems():
         combination = alpha*count + beta*intersection
+        # combination = intersection  # test a "custom" implementation of Lesk's algorithm (to compare with lesk_2).
         if combination > max_count:
             max_count = combination
             ss = wn.synset(ss_name)
@@ -384,7 +385,7 @@ def evaluate(instances, keys):
 if __name__ == '__main__':
     data_f = 'multilingual-all-words.en.xml'
     key_f = 'wordnet.en.key'
-    dev_instances, test_instances = load_instances(data_f, remove_stop_words=True)
+    dev_instances, test_instances = load_instances(data_f, remove_stop_words=False)
     dev_keys, test_keys = load_key(key_f, lemma2synset=True)  # directly do the conversion from lemma_key to synset_name
 
     # IMPORTANT: keys contain fewer entries than the instances; need to remove them
@@ -396,7 +397,7 @@ if __name__ == '__main__':
     print "new test_instances:", len(test_instances)
 
     ###
-    # EVALUATE BEFORE ANY PREDICTION
+    # EVALUATE BEFORE ANY PREDICTION (100% precision, 0% recall)
     ###
     print "\nEvaluation of dev_set:"
     evaluate(dev_instances, dev_keys)
@@ -433,3 +434,40 @@ if __name__ == '__main__':
     evaluate(dev_instances, dev_keys)
     print "\nEvaluation of test_set:"
     evaluate(test_instances, test_keys)
+
+    ###
+    # Check context_length <-> accuracy relation
+    ###
+    c_length2accuracy = {}  # {length:[correct guesses, total guesses], ...}
+    # Build mapping form context length to correct count.
+    for key, wsd_instance in test_instances.iteritems():
+        c_length = len(wsd_instance.context)
+        if c_length in c_length2accuracy.keys():
+            c_length2accuracy[c_length][1] += 1.
+            if wsd_instance.synset_name['lesk2'] in test_keys[key] :
+                c_length2accuracy[c_length][0] += 1.
+        else:
+            c_length2accuracy[c_length] = [0., 1.]
+            if wsd_instance.synset_name['lesk2'] in test_keys[key] :
+                c_length2accuracy[c_length][0] += 1.
+
+    print "\n", c_length2accuracy
+
+    # Convert counts to accuracy
+    for length, count in c_length2accuracy.iteritems():
+        c_length2accuracy[length][0] /= c_length2accuracy[length][1]
+
+    def plot_dictionary(d):
+        pos = np.arange(len(d))
+        ax = plt.axes()
+        ax.set_xticks(pos+0.5)
+        ax.set_xticklabels(d.keys())
+
+        plt.bar(d.keys(), d.values(), 1.0, color='g')
+        plt.show()
+
+    # make proper dictionary to plot: only take accuracy, not total counts.
+    c_length2accuracy_dic = {}
+    for key, val in c_length2accuracy.iteritems():
+        c_length2accuracy_dic[key] = val[0]
+    plot_dictionary(c_length2accuracy_dic)
