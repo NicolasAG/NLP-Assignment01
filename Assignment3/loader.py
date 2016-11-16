@@ -198,7 +198,7 @@ def train_lesk3(dev_instances, dev_keys, use_pos):
     :param use_pos: flag to decide to use POS tags to retrieve the synsets.
     :return: weight of frequency signal (alpha), and weight of intersection signal (beta).
     """
-    # BUILDING MATRICES X & Y to perform Linear Regression
+    # BUILDING MATRICES X & Y to perform Logistic Regression
     x = []
     y = []
     for key, wsd_instance in dev_instances.iteritems():
@@ -229,12 +229,12 @@ def train_lesk3(dev_instances, dev_keys, use_pos):
     y = np.asarray(y)
 
     # LEARNING WEIGHTS
-    regression = linear_model.LinearRegression()
-    regression.fit(x, y)
+    regression = linear_model.LogisticRegression()
+    regression.fit(x, y.reshape(len(y)))
     w = regression.coef_[0]
-    # print('Coefficients: \n', regression.coef_)  # coefficients
-    # print('Mean squared error: %.2f' % np.mean((regression.predict(x) - y) ** 2))  # mean squared error
-    # print('Variance score: %.2f' % regression.score(x, y))  # Explained variance score: 1 is perfect prediction
+    #print('Coefficients: \n', regression.coef_)  # coefficients
+    #print('Mean squared error: %.2f' % np.mean((regression.predict(x) - y) ** 2))  # mean squared error
+    #print('Variance score: %.2f' % regression.score(x, y))  # Explained variance score: 1 is perfect prediction
 
     return 1., 0.5  # hard-coded values worked better :/
     # return w[0], w[1]
