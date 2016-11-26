@@ -1,0 +1,26 @@
+Tech giants rush to invest in Montreal artificial intelligence research lab.
+'Right now is just the tip of the iceberg,' says head of the Montreal Institute for Learning Algorithm.
+Artificial intelligence, once relegated to the realm of science fiction, is now found in everything from translation services to virtual assistants to video games.
+And as companies race to develop self-driving cars and offer increasingly personalized online experiences, they're building on research that was largely pioneered by a group of Canadian researchers who are still attracting plenty of attention and investment dollars.
+Montreal, in particular, has developed a concentration of expertise in the area of AI, largely thanks to the efforts of University of Montreal professor Yoshua Bengio, head of the Montreal Institute for Learning Algorithms (MILA).
+"(AI) will affect pretty much every economic sector; right now is just the tip of the iceberg," Bengio told The Canadian Press.
+"One of the things we are going to see more of is how these technologies affect how we interact with computers."
+As a result of its research, Bengio says the institute has attracted interest from "most of the major IT companies," some of which have also provided funding.
+Google gets on board.
+Now, tech giant Google is jumping in, investing $4.5 million over three years to support the institute's research, as well as opening an AI research group at its Montreal office.
+This comes on the heels of the Canadian government announcing an investment of more than $200 million in three Montreal universities - including Bengio's - to create a learning hub to explore artificial intelligence and big data.
+Shibl Mourad, the head of engineering for Google's Montreal office, says the company hopes to help turn the city into a "super-cluster" of AI knowledge that will attract corporate investors, burgeoning startups and researchers.
+He said much of the credit goes to Bengio and his colleagues, whose research over the last decade has put the city ahead of its competitors.
+"Their contribution was foundational," he said.
+Had these researchers not invested that decade of their lives, "we would not be where we are," Mourad said.
+The lab Bengio leads is one of the largest in the world dedicated to studying Deep Learning, one of the underpinnings of AI.
+Over the past decade, they learned that by layering several "neural networks" that mimic how the brain works, computer programs could "learn" to solve complex problems on their own instead of needing to be programmed step-by-step.
+By analyzing a large number of examples, the program could eventually learn to identify patterns, such as recognizing objects in photos or language patterns.
+From personal assistance to self-driving cars.
+This fundamental research has led to breakthroughs in translation programs, personal assistance, "smart" cameras and self-driving cars, among others, Bengio says.
+"At some point you'll just talk to computers, and they'll understand what you want and what you need," he said.
+"It may take years, but we're clearly going in that direction."
+Bengio says AI knowledge also has broad applications in the medical field, and could be used to help doctors read scans, research and diagnose conditions, or sift through the massive amount of information contained in the human genome.
+In the short term, he's hoping the new investments will help Montreal "capitalize on its advance" by attracting corporations and startups to set up in the city - reversing the brain drain that has seen many of the brightest researchers leave to find employment elsewhere.
+He says it's a hopeful sign that former Montrealer Hugo Larochelle will be returning to the city to head Google's new research group.
+"We'd like to see more of that, and we'd like to attract people who aren't Canadians to Montreal," he said.

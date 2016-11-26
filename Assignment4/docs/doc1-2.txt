@@ -1,0 +1,10 @@
+Google expands support for MILA and opens deep learning research center in Montreal - 21 November 2016.
+Big news for Montreal!
+Google will expand its academic support to deep learning at U. Montreal's MILA (core to IVADO AI-OR hub), offering Focused Research Awards to 7 MILA faculty at U. Montreal and at neighbour McGill U.: Pascal Vincent, Aaron Courville, Christopher Pal, Doina Precup, Joelle Pineau, Simon Lacoste-Julien, Laurent Charlin.
+Furthermore, Google will renew Yoshua Bengio's Focused Research Award.
+All these awards taken together, for a period of 3 years, bring Google's donation to MILA (bridging U. Montreal, Polytechnique Montreal, HEC Montreal and McGill U.) to 3.375M$US, i.e., about 4.5 M$C or 1.5M$C per year.
+In addition, Google has decided to open a deep learning & AI research group here in Montreal, linked to its Google Brain group in Mountain View, California.
+This group will be led by Hugo Larochelle, a forerunner of the deep learning community and a PhD graduate from Yoshua Bengio's lab at U. Montreal.
+This is a great example of reverse brain-drain, since Hugo will be coming back from the US to Montreal.
+Montreal's top universities together now count more than 150 researchers (including students) in deep learning, the greatest academic concentration in the world.
+In collaboration with their academic partners such as Google, and with incubators and start-up factories such as the recently announced Element AI, the MILA and the IVADO hub are contributing keystone AI expertise to Montreal's bustling big data ecosystem, empowering the community both scientifically and strategically to foster technological innovation based on AI.

@@ -1,0 +1,13 @@
+Google invests $4.5 Million in Montreal AI Research.
+"How crazy is this start to the Habs' season?!"
+I think we all know the answer to that question (especially if you live in Montreal!), but in casual conversation there's a good chance this phrasing and terminology would trip up a computer trying to make sense of what's being said.
+Learning high-level abstractions is a major research challenge for deep learning.
+A new grant from Google for the Montreal Institute for Learning Algorithms (MILA) will fund seven faculty across a number of Montreal institutions and will help tackle some of the biggest challenges in machine learning and AI, including applications in the realm of systems that can understand and generate natural language.
+In other words, better understand a fan's enthusiasm for Les Canadien.
+Google is expanding its academic support of deep learning at MILA, renewing Yoshua Bengio's Focused Research Award and offering Focused Research Awards to MILA faculty at University of Montreal and McGill University: Pascal Vincent, Aaron Courville, Christopher Pal, Doina Precup, Joelle Pineau, Simon Lacoste-Julien, and Laurent Charlin.
+These awards taken together, for a period of 3 years, bring Google's total donation to MILA (bridging University of Montreal and McGill) to a total of $4.5 million ($3.375M USD).
+In addition to this grant, Google is opening a deep learning and AI research group here in our Montreal office, linked to the Google Brain team in Mountain View, California.
+It will be led by Hugo Larochelle, a leader within the deep learning community who is returning from Boston to Montreal.
+This kind of corporate investment paired with a burgeoning AI start-up community and substantial government funding to the IVADO hub for data science, deep learning and operations research has turned Montreal into a global machine intelligence powerhouse.
+University of Montreal and McGill together now count more than 150 researchers (including students) in deep learning, the greatest academic concentration in the world.
+In collaboration with academic partners such as Google, incubators and start-ups, MILA and IVADO are making Montreal a hub for AI and technological innovation.
