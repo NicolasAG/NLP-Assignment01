@@ -150,12 +150,14 @@ def sumbasic(files_content, non_redundancy=True, limit=100, v=False):
     sentence_scores = get_sentence_scores(sentences, word_probas)
 
     summary = ""
-    while len(summary) < limit:
+    length = 0
+    while length < limit:
         # print "max score: %f" % max(sentence_scores.keys())
         # print "sentences:", sentence_scores[max(sentence_scores.keys())]
         sent_ids = sentence_scores[max(sentence_scores.keys())]
         sent_id = sent_ids[random.randint(0, len(sent_ids)-1)]  # if multiple ids for the same score: take a random one.
         summary += sentences[sent_id][0] + ' '  # [0] : add the original sentence, not the processed one [1].
+        length += len(sentences[sent_id][0].split())
         if non_redundancy:
             # update word probabilities
             for w in sentences[sent_id][1].split():  # consider preprocessed sentence for non-redundancy update.
@@ -164,7 +166,7 @@ def sumbasic(files_content, non_redundancy=True, limit=100, v=False):
             sentence_scores = get_sentence_scores(sentences, word_probas)
 
     print summary
-    if v: print "length: %d" % len(summary)
+    if v: print "length: %d" % length
     return summary
 
 
@@ -178,16 +180,18 @@ def leading(files_content, limit=100, v=False):
     """
     if v: print "\nGenerating `leading` summary..."
     summary = ""
+    length = 0
     file_number = random.randint(0, len(files_content)-1)  # take a random file
     if v: print "using file %d" % file_number
     for i, sentence in files_content[file_number].iteritems():
         # sentence = [original_line, processed_line]
-        if len(summary) < limit:
-            summary += sentence[0]+' '  # take the original sentence
+        if length < limit:
+            summary += sentence[0]+' '  # [0] : add the original sentence, not the processed one [1].
+            length += len(sentence[0].split())
         else:
             break
     print summary
-    if v: print "length: %d" % len(summary)
+    if v: print "length: %d" % length
     return summary
 
 
