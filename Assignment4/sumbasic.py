@@ -126,17 +126,18 @@ def get_sentence_scores(sentences, word_probas):
     return sentence_scores
 
 
-def sumbasic(files_content, non_redundancy=True, limit=100):
+def sumbasic(files_content, non_redundancy=True, limit=100, v=False):
     """
     Build a summary of the different files using the SumBasic algorithm.
     :param files_content: list of dictionaries for each document.
     :param non_redundancy: flag to decide to include the word-score update.
     :param limit: the number of words to aim for in the summary.
+    :param v: flag for verbose output.
     :return: a 100-word summary for the corpus of documents.
     """
-    if non_redundancy:
+    if non_redundancy and v:
         print "\nGenerating `orig` summary..."
-    else:
+    elif v:
         print "\nGenerating `simplified` summary..."
 
     # Get ONE dictionary of the form {sentence_id: [original_version, processed_version], ...} for ALL files
@@ -163,21 +164,22 @@ def sumbasic(files_content, non_redundancy=True, limit=100):
             sentence_scores = get_sentence_scores(sentences, word_probas)
 
     print summary
-    print "length: %d" % len(summary)
+    if v: print "length: %d" % len(summary)
     return summary
 
 
-def leading(files_content, limit=100):
+def leading(files_content, limit=100, v=False):
     """
     Build a summary of different files by taking the first few sentences of one file.
     :param files_content: list of dictionaries for each document.
     :param limit: the number of words to aim for in the summary.
+    :param v: flag for verbose output.
     :return: a 100-word summary for the corpus of documents.
     """
-    print "\nGenerating `leading` summary..."
+    if v: print "\nGenerating `leading` summary..."
     summary = ""
     file_number = random.randint(0, len(files_content)-1)  # take a random file
-    print "using file %d" % file_number
+    if v: print "using file %d" % file_number
     for i, sentence in files_content[file_number].iteritems():
         # sentence = [original_line, processed_line]
         if len(summary) < limit:
@@ -185,12 +187,11 @@ def leading(files_content, limit=100):
         else:
             break
     print summary
-    print "length: %d" % len(summary)
+    if v: print "length: %d" % len(summary)
     return summary
 
 
 def main():
-    # TODO: COMMENT ALL PRINT STATEMENTS BEFORE SUBMISSION!!!!
     parser = argparse.ArgumentParser(description="Multi-document Summarization.")
     parser.add_argument("method",
                         choices=("orig", "simplified", "leading"),
@@ -198,19 +199,22 @@ def main():
     parser.add_argument("cluster",
                         nargs='+',
                         help="path to a cluster. ex: `./docs/doc1-*.txt`")
+    parser.add_argument("-v", "--verbose",
+                        action="store_true",
+                        help="increase output verbosity")
     args = parser.parse_args()
-    print args
+    if args.verbose: print args
 
-    print "\nProcessing files..."
+    if args.verbose: print "\nProcessing files..."
     files_content = []  # list of dictionaries for each document.
     for f_name in args.cluster:
-        print "%s..." % f_name
+        if args.verbose: print "%s..." % f_name
         sentences = codecs.open(f_name, 'r', encoding='utf-8').read()
         sentences = codecs.encode(sentences, 'ascii', 'ignore')
         sentences = sent_tokenize(sentences)
-        print "... has %d sentences." % len(sentences)
+        if args.verbose: print "... has %d sentences." % len(sentences)
         files_content.append(preprocess_file(sentences))
-    print "done."
+    if args.verbose: print "done."
     # files_content is of the form: [
     #   {
     #     0:['original_FIRST_sentence', 'processed_FIRST_sentence'],
@@ -221,11 +225,11 @@ def main():
     # ]
 
     if args.method == 'orig':
-        sumbasic(files_content, non_redundancy=True, limit=100)
+        sumbasic(files_content, non_redundancy=True, limit=100, v=args.verbose)
     elif args.method == 'simplified':
-        sumbasic(files_content, non_redundancy=False, limit=100)
+        sumbasic(files_content, non_redundancy=False, limit=100, v=args.verbose)
     elif args.method == 'leading':
-        leading(files_content, limit=100)
+        leading(files_content, limit=100, v=args.verbose)
 
 
 if __name__ == '__main__':

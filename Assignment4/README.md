@@ -30,8 +30,8 @@ Decide how to select the article arbitrarily.
 
 Apply standard preprocessing steps on the input documents: sentence segmentation, lemmatization, ignoring stopwords and case distinctions.
 
-Run the code: `python sumbasic.py <method_name> <file_n>*`
-It prints the output summary to standard output.
+Run the code: `python sumbasic.py <method_name> <files>`
+It prints the output summary to standard output. If -v flag, also outputs debug flow and summary length.
 ex: `python sumbasic.py simplified ./docs/doc1-*.txt > simplified-1.txt`
 will run the simplified version of the summarizer on the first cluster, writing the output to a text file called `simplified-1.txt`.
 
